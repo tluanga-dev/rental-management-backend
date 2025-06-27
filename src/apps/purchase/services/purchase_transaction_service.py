@@ -6,7 +6,7 @@ import logging
 
 from apps.purchase.models import PurchaseTransaction, PurchaseTransactionItem
 from apps.inventory_item.models import (
-    InventoryItem, 
+    LineItem, 
     InventoryItemMaster, 
     InventoryItemStockMovement,
     MovementType
@@ -63,8 +63,11 @@ class PurchaseTransactionService:
                 # Create purchase transaction
                 purchase_transaction = self._create_purchase_transaction(transaction_data)
                 
-                # Process each item
+                # Process each item - prepare for bulk operations
                 created_items = []
+                line_items_to_create = []
+                stock_movements_to_create = []
+                
                 for item_data in items_data:
                     created_item_info = self._process_purchase_item(
                         purchase_transaction, 
@@ -223,7 +226,7 @@ class PurchaseTransactionService:
         item_master: InventoryItemMaster,
         item_data: Dict[str, Any],
         transaction_id: str
-    ) -> InventoryItem:
+    ) -> LineItem:
         """
         Get existing inventory item or create a new one.
         """
@@ -235,7 +238,7 @@ class PurchaseTransactionService:
         # For individually tracked items with serial numbers
         if item_master.tracking_type == 'INDIVIDUAL' and item_data.get('serial_number'):
             # Check if serial number already exists
-            existing_item = InventoryItem.objects.filter(
+            existing_item = LineItem.objects.filter(
                 serial_number=item_data['serial_number']
             ).first()
             
@@ -245,7 +248,7 @@ class PurchaseTransactionService:
                 })
             
             # Create new individual item
-            inventory_item = InventoryItem.objects.create(
+            inventory_item = LineItem.objects.create(
                 inventory_item_master=item_master,
                 warehouse=warehouse,
                 serial_number=item_data['serial_number'],
@@ -263,7 +266,7 @@ class PurchaseTransactionService:
             )
         else:
             # For bulk items, try to find existing inventory item
-            inventory_item = InventoryItem.objects.filter(
+            inventory_item = LineItem.objects.filter(
                 inventory_item_master=item_master,
                 warehouse=warehouse,
                 serial_number__isnull=True  # Bulk items don't have serial numbers
@@ -271,7 +274,7 @@ class PurchaseTransactionService:
             
             if not inventory_item:
                 # Create new bulk inventory item
-                inventory_item = InventoryItem.objects.create(
+                inventory_item = LineItem.objects.create(
                     inventory_item_master=item_master,
                     warehouse=warehouse,
                     quantity=0,  # Will be updated by stock movement
@@ -290,7 +293,7 @@ class PurchaseTransactionService:
     def _create_transaction_item(
         self,
         purchase_transaction: PurchaseTransaction,
-        inventory_item: InventoryItem,
+        inventory_item: LineItem,
         item_data: Dict[str, Any]
     ) -> PurchaseTransactionItem:
         """
@@ -324,7 +327,7 @@ class PurchaseTransactionService:
     
     def _create_stock_movement(
         self,
-        inventory_item: InventoryItem,
+        inventory_item: LineItem,
         quantity: int,
         transaction_id: str
     ) -> InventoryItemStockMovement:

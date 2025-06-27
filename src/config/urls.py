@@ -42,4 +42,5 @@ urlpatterns = [
     path("api/items/", include("apps.item_category.urls")),          # /api/items/categories/, /api/items/subcategories/
     path("api/inventory/", include("apps.inventory_item.urls")),     # /api/inventory/
     path("api/purchases/", include("apps.purchase.urls")),          # /api/purchases/
+    path("api/id-manager/", include("apps.id_manager.urls")),       # /api/id-manager/
 ]

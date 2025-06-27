@@ -187,7 +187,7 @@ class WarrantyPeriodType(models.TextChoices):
     MONTHS = "MONTHS", _("Months")
     YEARS = "YEARS", _("Years")
 
-class InventoryItem(TimeStampedAbstractModelClass):
+class LineItem(TimeStampedAbstractModelClass):
     """
     Individual inventory item instances or bulk batches
     """
@@ -302,8 +302,8 @@ class InventoryItem(TimeStampedAbstractModelClass):
     )
     
     class Meta:
-        verbose_name = _("Inventory Item")
-        verbose_name_plural = _("Inventory Items")
+        verbose_name = _("Line Item")
+        verbose_name_plural = _("Line Items")
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['status']),
@@ -343,7 +343,7 @@ class InventoryItemStockMovement(TimeStampedAbstractModelClass):
     Track all stock movements for inventory items
     """
     inventory_item = models.ForeignKey(
-        'InventoryItem',
+        'LineItem',
         on_delete=models.PROTECT,
         verbose_name=_("inventory item"),
         related_name='movements',

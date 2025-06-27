@@ -106,6 +106,38 @@ class IdManager(TimeStampedAbstractModelClass):
 
         # All characters were Z - add new character
         return "A" * (len(chars) + 1)
+    
+    @classmethod
+    def health_check(cls):
+        """
+        Health check method to verify ID Manager service is operational.
+        Returns a dictionary with status and diagnostic information.
+        """
+        try:
+            # Try to access the database
+            count = cls.objects.count()
+            
+            # Try to generate a test ID
+            test_prefix = "_HEALTH_CHECK_"
+            test_id = cls.generate_id(test_prefix)
+            
+            # Clean up test entry
+            cls.objects.filter(prefix=test_prefix).delete()
+            
+            return {
+                'status': 'healthy',
+                'message': 'ID Manager service is operational',
+                'prefix_count': count,
+                'test_id_generated': test_id,
+                'timestamp': models.functions.Now()
+            }
+        except Exception as e:
+            return {
+                'status': 'unhealthy',
+                'message': f'ID Manager service error: {str(e)}',
+                'error_type': type(e).__name__,
+                'timestamp': models.functions.Now()
+            }
 
 
 # Example Usage 1: Basic ID Generation

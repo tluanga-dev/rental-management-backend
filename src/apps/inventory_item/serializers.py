@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import InventoryItem, InventoryItemMaster, InventoryItemStockMovement
+from .models import LineItem, InventoryItemMaster, InventoryItemStockMovement
 
 
 class InventoryItemMasterSerializer(serializers.ModelSerializer):
@@ -26,16 +26,16 @@ class InventoryItemMasterSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 
-class InventoryItemSerializer(serializers.ModelSerializer):
+class LineItemSerializer(serializers.ModelSerializer):
     """
-    Serializer for InventoryItem model
+    Serializer for LineItem model
     """
     inventory_item_master_name = serializers.CharField(source='inventory_item_master.name', read_only=True)
     inventory_item_master_sku = serializers.CharField(source='inventory_item_master.sku', read_only=True)
     warehouse_name = serializers.CharField(source='warehouse.name', read_only=True)
     
     class Meta:
-        model = InventoryItem
+        model = LineItem
         fields = [
             'id', 'inventory_item_master', 'inventory_item_master_name', 'inventory_item_master_sku',
             'warehouse', 'warehouse_name', 'status', 'serial_number', 'quantity',

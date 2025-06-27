@@ -48,7 +48,7 @@ class PurchaseTransactionItem(TimeStampedAbstractModelClass):
         related_name="transaction_items"
     )
     inventory_item = models.ForeignKey(
-        'inventory_item.InventoryItem', 
+        'inventory_item.LineItem', 
         on_delete=models.PROTECT, 
         related_name="transaction_line_items"
     )

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import InventoryItemMaster, InventoryItem, InventoryItemStockMovement
+from .models import InventoryItemMaster, LineItem, InventoryItemStockMovement
 
 
 @admin.register(InventoryItemMaster)
@@ -33,8 +33,8 @@ class InventoryItemMasterAdmin(admin.ModelAdmin):
     )
 
 
-@admin.register(InventoryItem)
-class InventoryItemAdmin(admin.ModelAdmin):
+@admin.register(LineItem)
+class LineItemAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'status', 'warehouse', 'rentable', 'sellable', 'created_at']
     list_filter = ['status', 'warehouse', 'rentable', 'sellable', 'created_at']
     search_fields = ['serial_number', 'inventory_item_master__name', 'inventory_item_master__sku']

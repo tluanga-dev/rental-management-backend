@@ -9,7 +9,7 @@ from .serializers import (
     CreatePurchaseTransactionSerializer,
     PurchaseTransactionDetailSerializer
 )
-from .services import PurchaseTransactionService
+from .services.purchase_transaction_service_v2 import PurchaseTransactionServiceV2
 
 
 @create_standard_schema_view(
@@ -28,7 +28,12 @@ class PurchaseTransactionViewSet(BaseModelViewSet):
     - Searching by transaction ID, reference number, and invoice number
     - Filtering by vendor, transaction date, and amounts
     """
-    queryset = PurchaseTransaction.objects.select_related('vendor').all()
+    queryset = PurchaseTransaction.objects.select_related(
+        'vendor'
+    ).prefetch_related(
+        'transaction_items__inventory_item__inventory_item_master',
+        'transaction_items__inventory_item__warehouse'
+    ).all()
     serializer_class = PurchaseTransactionSerializer
     search_fields = ['transaction_id', 'reference_number', 'invoice_number', 'vendor__name']
     filterset_fields = ['vendor', 'transaction_date']
@@ -57,8 +62,8 @@ class PurchaseTransactionViewSet(BaseModelViewSet):
         serializer = self.get_serializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         
-        # Use the service to create the purchase transaction
-        service = PurchaseTransactionService()
+        # Use the enhanced service to create the purchase transaction
+        service = PurchaseTransactionServiceV2()
         purchase_transaction, created_items = service.create_purchase_transaction(
             serializer.validated_data
         )
@@ -93,7 +98,10 @@ class PurchaseTransactionItemViewSet(BaseModelViewSet):
     - Filtering by transaction, inventory item, and warranty details
     """
     queryset = PurchaseTransactionItem.objects.select_related(
-        'transaction', 'inventory_item__inventory_item_master'
+        'transaction__vendor',
+        'inventory_item__inventory_item_master__item_sub_category',
+        'inventory_item__inventory_item_master__unit_of_measurement',
+        'inventory_item__warehouse'
     ).all()
     serializer_class = PurchaseTransactionItemSerializer
     search_fields = [

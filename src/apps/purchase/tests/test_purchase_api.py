@@ -7,8 +7,8 @@ from rest_framework import status
 
 from apps.purchase.models import PurchaseTransaction
 from apps.inventory_item.models import (
-    InventoryItemMaster, 
-    InventoryItemStockMovement,
+    LineItemMaster, 
+    LineItemStockMovement,
     TrackingType
 )
 from apps.warehouse.models import Warehouse
@@ -71,7 +71,7 @@ class PurchaseTransactionAPITestCase(TestCase):
         )
         
         # Create item master
-        self.item_master = InventoryItemMaster.objects.create(
+        self.item_master = LineItemMaster.objects.create(
             name="API Test Item",
             sku="API-001",
             item_sub_category=self.subcategory,
@@ -127,7 +127,7 @@ class PurchaseTransactionAPITestCase(TestCase):
         self.assertEqual(transaction.transaction_items.count(), 1)
         
         # Verify stock movement was created
-        movements = InventoryItemStockMovement.objects.filter(
+        movements = LineItemStockMovement.objects.filter(
             inventory_transaction_id=response_data['transaction_id']
         )
         self.assertEqual(movements.count(), 1)

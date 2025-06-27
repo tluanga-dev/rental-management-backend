@@ -1,8 +1,8 @@
 from rest_framework.routers import DefaultRouter
 from apps.base.base_viewset import BaseModelViewSet, create_standard_schema_view
-from .models import InventoryItem, InventoryItemMaster, InventoryItemStockMovement
+from .models import LineItem, InventoryItemMaster, InventoryItemStockMovement
 from .serializers import (
-    InventoryItemSerializer, 
+    LineItemSerializer, 
     InventoryItemMasterSerializer, 
     InventoryItemStockMovementSerializer
 )
@@ -39,7 +39,7 @@ class InventoryItemMasterViewSet(BaseModelViewSet):
     "Inventory item instance management with search and filtering capabilities",
     ["Inventory Management"]
 )
-class InventoryItemViewSet(BaseModelViewSet):
+class LineItemViewSet(BaseModelViewSet):
     """
     ViewSet for managing inventory item instances.
     
@@ -50,10 +50,10 @@ class InventoryItemViewSet(BaseModelViewSet):
     - Searching by serial number and master item details
     - Filtering by status, warehouse, rentable/sellable flags
     """
-    queryset = InventoryItem.objects.select_related(
+    queryset = LineItem.objects.select_related(
         'inventory_item_master', 'warehouse'
     ).all()
-    serializer_class = InventoryItemSerializer
+    serializer_class = LineItemSerializer
     search_fields = ['serial_number', 'inventory_item_master__name', 'inventory_item_master__sku']
     filterset_fields = ['status', 'warehouse', 'rentable', 'sellable', 'inventory_item_master']
     ordering_fields = ['created_at', 'serial_number', 'rental_rate', 'status']
@@ -89,5 +89,5 @@ class InventoryItemStockMovementViewSet(BaseModelViewSet):
 # Router registration
 router = DefaultRouter()
 router.register(r'inventory-masters', InventoryItemMasterViewSet, basename='inventory_item_master')
-router.register(r'inventory-items', InventoryItemViewSet, basename='inventory_item')
+router.register(r'line-items', LineItemViewSet, basename='line_item')
 router.register(r'inventory-movements', InventoryItemStockMovementViewSet, basename='inventory_stock_movement')

@@ -6,9 +6,9 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from apps.purchase.models import PurchaseTransaction, PurchaseTransactionItem
 from apps.purchase.services import PurchaseTransactionService
 from apps.inventory_item.models import (
-    InventoryItemMaster, 
-    InventoryItem, 
-    InventoryItemStockMovement,
+    LineItemMaster, 
+    LineItem, 
+    LineItemStockMovement,
     TrackingType,
     MovementType
 )
@@ -61,7 +61,7 @@ class PurchaseTransactionServiceTestCase(TestCase):
         )
         
         # Create item masters
-        self.bulk_item_master = InventoryItemMaster.objects.create(
+        self.bulk_item_master = LineItemMaster.objects.create(
             name="Bulk Test Item",
             sku="BULK-001",
             item_sub_category=self.subcategory,
@@ -70,7 +70,7 @@ class PurchaseTransactionServiceTestCase(TestCase):
             tracking_type=TrackingType.BULK
         )
         
-        self.individual_item_master = InventoryItemMaster.objects.create(
+        self.individual_item_master = LineItemMaster.objects.create(
             name="Individual Test Item",
             sku="IND-001",
             item_sub_category=self.subcategory,
@@ -126,10 +126,10 @@ class PurchaseTransactionServiceTestCase(TestCase):
         self.assertEqual(transaction_item.quantity, 10)
         self.assertEqual(transaction_item.unit_price, Decimal('100.00'))
         
-        # Verify inventory item
-        inventory_item = item_info['inventory_item']
-        self.assertEqual(inventory_item.quantity, 10)
-        self.assertEqual(inventory_item.warehouse, self.warehouse)
+        # Verify line item
+        line_item = item_info['line_item']
+        self.assertEqual(line_item.quantity, 10)
+        self.assertEqual(line_item.warehouse, self.warehouse)
         
         # Verify stock movement
         stock_movement = item_info['stock_movement']
@@ -165,13 +165,13 @@ class PurchaseTransactionServiceTestCase(TestCase):
         self.assertIsNotNone(transaction)
         self.assertTrue(transaction.transaction_id.startswith('PUR-'))
         
-        # Verify inventory item
-        inventory_item = items[0]['inventory_item']
-        self.assertEqual(inventory_item.serial_number, 'SN-12345')
-        self.assertEqual(inventory_item.quantity, 1)
-        self.assertEqual(Decimal(str(inventory_item.rental_rate)), Decimal('50.00'))
-        self.assertEqual(inventory_item.warranty_period_type, 'YEARS')
-        self.assertEqual(inventory_item.warranty_period, 2)
+        # Verify line item
+        line_item = items[0]['line_item']
+        self.assertEqual(line_item.serial_number, 'SN-12345')
+        self.assertEqual(line_item.quantity, 1)
+        self.assertEqual(Decimal(str(line_item.rental_rate)), Decimal('50.00'))
+        self.assertEqual(line_item.warranty_period_type, 'YEARS')
+        self.assertEqual(line_item.warranty_period, 2)
     
     def test_create_purchase_transaction_multiple_items(self):
         """
@@ -232,8 +232,8 @@ class PurchaseTransactionServiceTestCase(TestCase):
         Test that duplicate serial numbers are rejected
         """
         # Create an existing item with serial number
-        InventoryItem.objects.create(
-            inventory_item_master=self.individual_item_master,
+        LineItem.objects.create(
+            line_item_master=self.individual_item_master,
             warehouse=self.warehouse,
             serial_number='SN-EXISTING',
             quantity=1
@@ -310,8 +310,8 @@ class PurchaseTransactionServiceTestCase(TestCase):
         """
         initial_transaction_count = PurchaseTransaction.objects.count()
         initial_item_count = PurchaseTransactionItem.objects.count()
-        initial_inventory_count = InventoryItem.objects.count()
-        initial_movement_count = InventoryItemStockMovement.objects.count()
+        initial_inventory_count = LineItem.objects.count()
+        initial_movement_count = LineItemStockMovement.objects.count()
         
         # Create data with invalid warehouse ID for second item
         data = {
@@ -336,8 +336,8 @@ class PurchaseTransactionServiceTestCase(TestCase):
         # Verify nothing was created
         self.assertEqual(PurchaseTransaction.objects.count(), initial_transaction_count)
         self.assertEqual(PurchaseTransactionItem.objects.count(), initial_item_count)
-        self.assertEqual(InventoryItem.objects.count(), initial_inventory_count)
-        self.assertEqual(InventoryItemStockMovement.objects.count(), initial_movement_count)
+        self.assertEqual(LineItem.objects.count(), initial_inventory_count)
+        self.assertEqual(LineItemStockMovement.objects.count(), initial_movement_count)
     
     def test_stock_movement_updates_master_quantity(self):
         """
