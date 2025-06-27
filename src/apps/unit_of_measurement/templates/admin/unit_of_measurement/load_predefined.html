@@ -1,0 +1,74 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:unit_of_measurement_unitofmeasurement_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {% trans 'Load Predefined Data' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="module aligned">
+    <form method="post">
+        {% csrf_token %}
+        
+        <fieldset class="module aligned">
+            <h2>Predefined Units of Measurement</h2>
+            <div class="form-row">
+                <div>
+                    <p>This will load the following categories of predefined units of measurement:</p>
+                    <ul style="column-count: 2; column-gap: 30px;">
+                        <li><strong>Weight Units:</strong> Kilogram, Gram, Metric Ton, Pound, Ounce</li>
+                        <li><strong>Volume Units:</strong> Liter, Milliliter, Cubic Meter, Gallon, Fluid Ounce</li>
+                        <li><strong>Count Units:</strong> Piece, Set, Dozen, Hundred Count</li>
+                        <li><strong>Length Units:</strong> Meter, Centimeter, Millimeter, Inch, Foot</li>
+                        <li><strong>Area Units:</strong> Square Meter, Square Centimeter, Square Foot, Hectare</li>
+                        <li><strong>Time Units:</strong> Day, Hour, Week, Month</li>
+                        <li><strong>Technology Units:</strong> Gigabyte, Terabyte, Core</li>
+                        <li><strong>Energy Units:</strong> Kilowatt Hour, Watt</li>
+                        <li><strong>Miscellaneous:</strong> Battery, Channel</li>
+                    </ul>
+                    <p>
+                        <strong>Total:</strong> Approximately 35+ units of measurement will be loaded.
+                    </p>
+                    <p class="help">
+                        <strong>Note:</strong> Existing units with the same name or abbreviation will be updated 
+                        with the predefined data. No data will be lost.
+                    </p>
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class="submit-row">
+            <input type="submit" value="Load Predefined Data" class="default" name="_load" 
+                   onclick="return confirm('This will load/update predefined units of measurement. Continue?')">
+            <p class="deletelink-box">
+                <a href="{% url 'admin:unit_of_measurement_unitofmeasurement_changelist' %}" class="deletelink">Cancel</a>
+            </p>
+        </div>
+    </form>
+</div>
+
+<div class="module" style="margin-top: 20px;">
+    <h2>Data Source</h2>
+    <p>
+        The predefined data comes from <code>data/unit_of_measurement.json</code> and includes 
+        comprehensive units suitable for rental and inventory management systems.
+    </p>
+    <p>
+        Each unit includes:
+    </p>
+    <ul>
+        <li><strong>Name:</strong> Full descriptive name</li>
+        <li><strong>Abbreviation:</strong> Standard short form</li>
+        <li><strong>Description:</strong> Detailed explanation with usage examples</li>
+    </ul>
+</div>
+{% endblock %}

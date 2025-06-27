@@ -1,0 +1,78 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Import Packaging Types from CSV | {{ site_title|default:"Django site admin" }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:item_packaging_itempackaging_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; Import from CSV
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Import Packaging Types from CSV</h1>
+
+<div class="module aligned">
+    <div class="form-row">
+        <div style="margin-bottom: 20px;">
+            <h2>Instructions:</h2>
+            <ul>
+                <li>Upload a CSV file with packaging type data</li>
+                <li>Required columns: <strong>name</strong>, <strong>label</strong>, <strong>unit</strong></li>
+                <li>Optional columns: <strong>remarks</strong></li>
+                <li>If a packaging type with the same label already exists, it will be updated</li>
+                <li>Labels will be automatically converted to uppercase</li>
+                <li><a href="{% url 'admin:item_packaging_csv_template' %}">Download CSV template</a> for the correct format</li>
+            </ul>
+        </div>
+        
+        <div style="background: #ffc; padding: 15px; margin-bottom: 20px; border: 1px solid #ed9;">
+            <h3>CSV Format Example:</h3>
+            <pre>name,label,unit,remarks
+Box,BOX,box,Standard cardboard box for small items
+Pallet,PLT,pallet,Wooden pallet for heavy items
+Bag,BAG,bag,Plastic or fabric bag for loose items</pre>
+        </div>
+    </div>
+    
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <div>
+                <label for="csv_file">Select CSV file:</label>
+                <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
+            </div>
+        </div>
+        
+        <div class="submit-row">
+            <input type="submit" value="Import CSV" class="default" />
+            <a href="{% url 'admin:item_packaging_itempackaging_changelist' %}" class="button cancel-link">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.cancel-link {
+    background: #ba2121;
+    padding: 10px 15px;
+    border-radius: 4px;
+    color: #fff;
+    text-decoration: none;
+    margin-left: 10px;
+}
+.cancel-link:hover {
+    background: #a41515;
+    color: #fff;
+}
+pre {
+    background: #f8f8f8;
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+</style>
+{% endblock %}

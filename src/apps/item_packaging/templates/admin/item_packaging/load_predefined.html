@@ -1,0 +1,81 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Load Predefined Packaging Types | {{ site_title|default:"Django site admin" }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:item_packaging_itempackaging_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; Load Predefined Data
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Load Predefined Packaging Types</h1>
+
+<div class="module aligned">
+    <div class="form-row">
+        <div style="margin-bottom: 20px;">
+            <h2>About Predefined Data:</h2>
+            <p>This will load a comprehensive set of standard packaging types from a predefined JSON file.</p>
+            <p>The predefined data includes common packaging types used across various industries:</p>
+            <ul>
+                <li><strong>Boxes</strong> - Various sizes and types of boxes</li>
+                <li><strong>Pallets</strong> - Standard shipping pallets</li>
+                <li><strong>Bags</strong> - Different bag types and materials</li>
+                <li><strong>Containers</strong> - Various container types</li>
+                <li><strong>Crates</strong> - Wooden and plastic crates</li>
+                <li><strong>Drums</strong> - Industrial drums and barrels</li>
+                <li><strong>Rolls</strong> - For rolled materials</li>
+                <li><strong>Bundles</strong> - For bundled items</li>
+            </ul>
+        </div>
+        
+        <div style="background: #e8f5e8; padding: 15px; margin-bottom: 20px; border: 1px solid #4caf50;">
+            <h3>What will happen:</h3>
+            <ul>
+                <li>Existing packaging types will be <strong>updated</strong> with new information</li>
+                <li>New packaging types will be <strong>created</strong></li>
+                <li>No data will be deleted</li>
+                <li>You'll see a summary of what was created/updated</li>
+            </ul>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; margin-bottom: 20px; border: 1px solid #ffeaa7;">
+            <h3>Note:</h3>
+            <p>This operation requires the predefined data file to be present at <code>data/item_packaging.json</code>.</p>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="submit-row">
+            <input type="submit" value="Load Predefined Data" class="default" onclick="return confirm('Are you sure you want to load predefined packaging types? This will update existing data.');" />
+            <a href="{% url 'admin:item_packaging_itempackaging_changelist' %}" class="button cancel-link">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.cancel-link {
+    background: #ba2121;
+    padding: 10px 15px;
+    border-radius: 4px;
+    color: #fff;
+    text-decoration: none;
+    margin-left: 10px;
+}
+.cancel-link:hover {
+    background: #a41515;
+    color: #fff;
+}
+code {
+    background: #f4f4f4;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+</style>
+{% endblock %}

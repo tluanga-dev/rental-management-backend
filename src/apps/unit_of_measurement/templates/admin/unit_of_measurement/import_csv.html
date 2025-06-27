@@ -1,0 +1,81 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:unit_of_measurement_unitofmeasurement_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; {% trans 'Import CSV' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="module aligned">
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div>
+                <label class="required" for="id_csv_file">CSV File:</label>
+                <input type="file" name="csv_file" accept=".csv" id="id_csv_file" required>
+                <p class="help">
+                    Select a CSV file with columns: <strong>name</strong>, <strong>abbreviation</strong>, <strong>description</strong>
+                </p>
+            </div>
+        </div>
+        
+        <fieldset class="module aligned">
+            <h2>CSV Format Requirements</h2>
+            <div class="form-row">
+                <div>
+                    <p>Your CSV file should have the following columns:</p>
+                    <ul>
+                        <li><strong>name</strong> (required): The full name of the unit (e.g., "Kilogram")</li>
+                        <li><strong>abbreviation</strong> (required): The short form (e.g., "kg")</li>
+                        <li><strong>description</strong> (optional): Detailed description of the unit</li>
+                    </ul>
+                    <p>
+                        <strong>Note:</strong> If a unit with the same name or abbreviation already exists, 
+                        it will be updated with the new information.
+                    </p>
+                </div>
+            </div>
+        </fieldset>
+        
+        <div class="submit-row">
+            <input type="submit" value="Import CSV" class="default" name="_import">
+            <p class="deletelink-box">
+                <a href="{% url 'admin:unit_of_measurement_unitofmeasurement_changelist' %}" class="deletelink">Cancel</a>
+            </p>
+        </div>
+    </form>
+    
+    <div class="module" style="margin-top: 20px;">
+        <h2>Quick Actions</h2>
+        <p>
+            <a href="{% url 'admin:unit_of_measurement_csv_template' %}" class="button">
+                Download CSV Template
+            </a>
+            - Download a sample CSV file with the correct format
+        </p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('id_csv_file');
+    fileInput.addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name;
+        if (fileName && !fileName.toLowerCase().endsWith('.csv')) {
+            alert('Please select a CSV file (.csv extension)');
+            e.target.value = '';
+        }
+    });
+});
+</script>
+{% endblock %}
